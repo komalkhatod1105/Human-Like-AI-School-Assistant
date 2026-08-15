@@ -36,9 +36,53 @@ def create_app():
         result = service.handle_escalation(role, user_id, target, request_id)
         return jsonify(result)
 
+    @app.route("/api/students/<student_id>", methods=["GET"])
+    def student_detail(student_id):
+        result = service.get_student(student_id)
+        return jsonify(result)
+
+    @app.route("/api/students/<student_id>/attendance", methods=["GET"])
+    def student_attendance(student_id):
+        result = service.get_student_attendance(student_id)
+        return jsonify(result)
+
+    @app.route("/api/parents/<parent_id>/children", methods=["GET"])
+    def parent_children(parent_id):
+        result = service.get_parent_children(parent_id)
+        return jsonify(result)
+
+    @app.route("/api/attendance/mark", methods=["POST"])
+    def attendance_mark():
+        payload = request.get_json(silent=True) or {}
+        result = service.mark_attendance_api(
+            payload.get("student_id"),
+            payload.get("date") or "today",
+            payload.get("status") or "present",
+            payload.get("teacher_id"),
+        )
+        return jsonify(result)
+
+    @app.route("/api/analytics/attendance", methods=["GET"])
+    def school_analytics():
+        result = service.get_school_analytics()
+        return jsonify(result)
+
+    @app.route("/api/support/call-request", methods=["POST"])
+    def support_call_request():
+        payload = request.get_json(silent=True) or {}
+        result = service.submit_support_request(
+            payload.get("requested_by"),
+            payload.get("target_type", "teacher"),
+            payload.get("student_id"),
+            payload.get("reason", "School support request"),
+        )
+        return jsonify(result)
+
     return app
 
 
+app = create_app()
+
+
 if __name__ == "__main__":
-    app = create_app()
     app.run(host="0.0.0.0", port=5000, debug=True)

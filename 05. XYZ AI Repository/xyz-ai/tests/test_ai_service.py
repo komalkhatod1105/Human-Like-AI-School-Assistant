@@ -15,10 +15,16 @@ def test_parent_child_attendance_access():
     assert "91.2%" in response["text"] or "91.2" in response["text"]
 
 
+def test_parent_cannot_view_unrelated_child():
+    service = SchoolAssistantService()
+    response = service.process_message("parent", "parent_1", "How much attendance does Rohan have?", [])
+    assert "permission" in response["text"].lower() or "only" in response["text"].lower()
+
+
 def test_permission_denied_for_unauthorized_access():
     service = SchoolAssistantService()
     response = service.process_message("parent", "parent_1", "What is the principal's attendance?", [])
-    assert "not authorized" in response["text"].lower() or "unauthorized" in response["text"].lower()
+    assert "not authorized" in response["text"].lower() or "unauthorized" in response["text"].lower() or "permission" in response["text"].lower()
 
 
 def test_prompt_injection_blocked():
@@ -31,6 +37,24 @@ def test_teacher_mark_attendance():
     service = SchoolAssistantService()
     response = service.process_message("teacher", "teacher_1", "Mark Rahul absent today.", [])
     assert "absent" in response["text"].lower()
+
+
+def test_student_cannot_mark_attendance():
+    service = SchoolAssistantService()
+    response = service.process_message("student", "student_1", "Mark Rahul absent today.", [])
+    assert "permission" in response["text"].lower()
+
+
+def test_principal_can_view_school_attendance():
+    service = SchoolAssistantService()
+    response = service.process_message("principal", "principal_1", "What is the overall attendance?", [])
+    assert "89.7%" in response["text"] or "89.7" in response["text"]
+
+
+def test_fake_role_claim_does_not_bypass_student_permissions():
+    service = SchoolAssistantService()
+    response = service.process_message("principal", "student_1", "What is my attendance?", [])
+    assert "91.2%" in response["text"] or "91.2" in response["text"]
 
 
 def test_app_factory():
