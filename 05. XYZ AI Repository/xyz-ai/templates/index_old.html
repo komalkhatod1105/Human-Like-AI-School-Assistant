@@ -56,6 +56,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 14px;
+            flex-wrap: wrap;
         }
 
         .brand {
@@ -98,10 +99,15 @@
             border-radius: 12px;
             font-size: 0.95rem;
             outline: none;
+            transition: border-color 0.2s ease;
         }
 
-        .controls select option,
-        .controls input option {
+        .controls select:hover,
+        .controls input:hover {
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .controls select option {
             color: #111827;
         }
 
@@ -115,6 +121,8 @@
             padding: 22px 22px 18px;
             border-right: 1px solid var(--line);
             background: rgba(248, 250, 252, 0.6);
+            display: flex;
+            flex-direction: column;
         }
 
         .avatar-panel {
@@ -139,6 +147,7 @@
             align-items: center;
             justify-content: center;
             font-size: 28px;
+            flex-shrink: 0;
         }
 
         .avatar.listening {
@@ -212,6 +221,7 @@
             padding: 18px;
             margin-bottom: 16px;
             box-shadow: inset 0 1px 8px rgba(148,163,184,0.10);
+            flex: 1;
         }
 
         .message {
@@ -248,6 +258,14 @@
             border-bottom-left-radius: 6px;
         }
 
+        .message.system {
+            background: rgba(248, 112, 112, 0.1);
+            border: 1px solid rgba(248, 112, 112, 0.2);
+            margin-right: 0;
+            margin-left: 0;
+            font-style: italic;
+        }
+
         .input-row {
             display: flex;
             gap: 10px;
@@ -269,6 +287,11 @@
             box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
         }
 
+        .input-row input:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
         .input-row button {
             background: linear-gradient(135deg, var(--primary), var(--primary-2));
             color: white;
@@ -279,6 +302,7 @@
             cursor: pointer;
             box-shadow: 0 10px 20px rgba(79,70,229,0.24);
             transition: transform 0.2s ease;
+            min-width: 80px;
         }
 
         .input-row button:hover {
@@ -289,11 +313,20 @@
             transform: translateY(0);
         }
 
+        .input-row button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .sidebar {
             padding: 22px;
             background: rgba(255,255,255,0.3);
             overflow-y: auto;
             max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
 
         .panel {
@@ -301,13 +334,13 @@
             border: 1px solid var(--line);
             border-radius: 18px;
             padding: 18px;
-            margin-bottom: 18px;
             box-shadow: 0 12px 18px rgba(15, 23, 42, 0.04);
         }
 
         .panel h3 {
             margin: 0 0 12px;
             font-size: 1.06rem;
+            font-weight: 600;
         }
 
         .metrics {
@@ -322,16 +355,19 @@
             border: 1px solid rgba(99, 102, 241, 0.14);
             border-radius: 12px;
             padding: 12px;
+            text-align: center;
         }
 
         .metric small {
             color: var(--muted);
             display: block;
             margin-bottom: 6px;
+            font-size: 0.8rem;
         }
 
         .metric strong {
             font-size: 1.2rem;
+            display: block;
         }
 
         .sample {
@@ -345,32 +381,52 @@
             color: var(--text);
             transition: transform 0.15s ease, box-shadow 0.15s ease;
             font-size: 0.9rem;
+            text-align: left;
         }
 
         .sample:hover {
             transform: translateY(-1px);
             box-shadow: 0 8px 18px rgba(59,130,246,0.08);
+            border-color: rgba(96,165,250,0.4);
         }
 
-        .voice-btn, .tts-btn {
+        .sample:active {
+            transform: translateY(0);
+        }
+
+        .interaction-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .voice-btn, .tts-btn, .escalate-btn {
             background: linear-gradient(135deg, var(--success), #0ea5a4);
             color: white;
             border: none;
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: 14px;
-            margin-top: 10px;
-            width: 100%;
             cursor: pointer;
             font-weight: 600;
             box-shadow: 0 12px 22px rgba(16, 185, 129, 0.18);
             transition: transform 0.2s ease;
+            font-size: 0.95rem;
         }
 
-        .voice-btn:hover, .tts-btn:hover {
+        .escalate-btn {
+            background: linear-gradient(135deg, var(--warning), var(--danger));
+            box-shadow: 0 12px 22px rgba(248, 112, 112, 0.18);
+        }
+
+        .voice-btn:hover, .tts-btn:hover, .escalate-btn:hover {
             transform: translateY(-2px);
         }
 
-        .voice-btn:disabled, .tts-btn:disabled {
+        .voice-btn:active, .tts-btn:active, .escalate-btn:active {
+            transform: translateY(0);
+        }
+
+        .voice-btn:disabled, .tts-btn:disabled, .escalate-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -414,6 +470,8 @@
             height: 100%;
             background: rgba(0,0,0,0.4);
             animation: fadeIn 0.3s ease-out;
+            align-items: center;
+            justify-content: center;
         }
 
         @keyframes fadeIn {
@@ -423,8 +481,6 @@
 
         .modal.show {
             display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .modal-content {
@@ -447,6 +503,18 @@
             }
         }
 
+        .modal-title {
+            margin: 0 0 12px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .modal-message {
+            margin: 0 0 20px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 12px;
@@ -461,10 +529,15 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s ease;
+            font-size: 0.95rem;
         }
 
         .modal-buttons button:hover {
             transform: translateY(-2px);
+        }
+
+        .modal-buttons button:active {
+            transform: translateY(0);
         }
 
         .btn-confirm {
@@ -494,10 +567,24 @@
 
             .container {
                 margin: 20px 12px;
+                border-radius: 18px;
             }
 
             .sidebar {
                 max-height: 400px;
+                gap: 12px;
+            }
+
+            .messages {
+                height: 300px;
+            }
+
+            .metric small {
+                font-size: 0.75rem;
+            }
+
+            .metric strong {
+                font-size: 1rem;
             }
         }
     </style>
@@ -510,18 +597,24 @@
                 <h1>XYZ AI School Assistant</h1>
             </div>
             <div class="controls">
-                <select id="languageSelect">
-                    <option value="en">English</option>
+                <select id="languageSelect" title="Select language">
+                    <option value="en">🌐 English</option>
                     <option value="hi">हिन्दी</option>
                     <option value="ta">தமிழ்</option>
                     <option value="te">తెలుగు</option>
                     <option value="mr">मराठी</option>
+                    <option value="bn">বাংলা</option>
+                    <option value="gu">ગુજરાતી</option>
+                    <option value="pa">ਪੰਜਾਬੀ</option>
+                    <option value="kn">ಕನ್ನಡ</option>
+                    <option value="ml">മലയാളം</option>
+                    <option value="ur">اردو</option>
                 </select>
-                <select id="userSelect">
-                    <option value="student_1">👤 Rahul (Student)</option>
-                    <option value="parent_1">👨‍👩‍👧 Priya (Parent)</option>
-                    <option value="teacher_1">👩‍🏫 Anita (Teacher)</option>
-                    <option value="principal_1">🎓 Raj (Principal)</option>
+                <select id="userSelect" title="Select user">
+                    <option value="S001">👤 Rahul (Student)</option>
+                    <option value="P001">👨‍👩‍👧 Priya (Parent)</option>
+                    <option value="T001">👩‍🏫 Anita (Teacher)</option>
+                    <option value="PR001">🎓 Raj (Principal)</option>
                 </select>
             </div>
         </div>
@@ -539,23 +632,19 @@
 
                 <div id="messages" class="messages"></div>
                 <div class="input-row">
-                    <input id="messageInput" type="text" placeholder="Ask about attendance, support, or teacher escalation..." />
-                    <button id="sendBtn">Send</button>
+                    <input id="messageInput" type="text" placeholder="Ask about attendance, support, or teacher escalation..." title="Type your message here" />
+                    <button id="sendBtn" title="Send message">Send</button>
                 </div>
             </div>
 
             <aside class="sidebar">
                 <div class="panel">
-                    <h3>Quick samples</h3>
-                    <span class="sample" data-message="What is my attendance?">📊 What is my attendance?</span>
-                    <span class="sample" data-message="How much attendance does my child have?">👨‍👩‍👧 Child's attendance?</span>
-                    <span class="sample" data-message="Mark Rahul absent today.">✏️ Mark attendance</span>
-                    <span class="sample" data-message="What is the overall attendance?">📈 Overall attendance?</span>
-                    <span class="sample" data-message="I want to talk to my child's teacher.">📞 Escalate to teacher</span>
+                    <h3>📝 Quick Samples</h3>
+                    <div id="samplesContainer"></div>
                 </div>
 
                 <div class="panel">
-                    <h3>School Status</h3>
+                    <h3>📊 School Status</h3>
                     <div class="metrics">
                         <div class="metric">
                             <small>Attendance</small>
@@ -577,9 +666,11 @@
                 </div>
 
                 <div class="panel">
-                    <h3>Interaction</h3>
-                    <button id="voiceBtn" class="voice-btn">🎤 Speak to AI</button>
-                    <button id="ttsBtn" class="tts-btn" disabled>🔊 Speak Response</button>
+                    <h3>🎙️ Interaction</h3>
+                    <div class="interaction-buttons">
+                        <button id="voiceBtn" class="voice-btn" title="Click to speak to AI">🎤 Speak to AI</button>
+                        <button id="ttsBtn" class="tts-btn" title="Speak last response" disabled>🔊 Speak Response</button>
+                    </div>
                 </div>
             </aside>
         </div>
@@ -588,18 +679,20 @@
     <!-- Escalation Confirmation Modal -->
     <div id="escalationModal" class="modal">
         <div class="modal-content">
-            <h2 id="escalationTitle">Confirm Escalation</h2>
-            <p id="escalationMessage">Are you sure you want to escalate this request?</p>
+            <h2 id="escalationTitle" class="modal-title">Confirm Escalation</h2>
+            <p id="escalationMessage" class="modal-message">Are you sure you want to escalate this request?</p>
             <div class="modal-buttons">
-                <button class="btn-confirm" id="confirmEscalation">Yes, Escalate</button>
+                <button class="btn-confirm" id="confirmEscalation">Yes, Proceed</button>
                 <button class="btn-cancel" id="cancelEscalation">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
+        // DOM elements
         const messagesEl = document.getElementById('messages');
         const inputEl = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
         const userSelect = document.getElementById('userSelect');
         const languageSelect = document.getElementById('languageSelect');
         const voiceBtn = document.getElementById('voiceBtn');
@@ -607,11 +700,66 @@
         const avatar = document.getElementById('avatar');
         const statusIndicator = document.getElementById('statusIndicator');
         const escalationModal = document.getElementById('escalationModal');
+        const samplesContainer = document.getElementById('samplesContainer');
 
+        // State
         let history = [];
         let lastAssistantMessage = '';
+        let currentUserRole = '';
         let isListening = false;
         let isSpeaking = false;
+        let speechRecognitionInstance = null;
+
+        // Role-based quick samples
+        const samplesByRole = {
+            student: [
+                { text: 'What is my attendance?', icon: '📊' },
+                { text: 'Show my attendance.', icon: '📋' },
+                { text: 'Am I maintaining good attendance?', icon: '✅' },
+                { text: 'I want to talk to my teacher.', icon: '📞' },
+            ],
+            parent: [
+                { text: 'How much attendance does my child have?', icon: '👨‍👩‍👧' },
+                { text: 'What about last month?', icon: '📅' },
+                { text: 'I want to talk to my child\'s teacher.', icon: '📞' },
+                { text: 'Contact school management.', icon: '🏫' },
+            ],
+            teacher: [
+                { text: 'Mark Rahul absent today.', icon: '✏️' },
+                { text: 'Show Rahul\'s attendance.', icon: '📊' },
+                { text: 'Which students have low attendance?', icon: '⚠️' },
+            ],
+            principal: [
+                { text: 'What is the overall attendance?', icon: '📈' },
+                { text: 'Which class has the lowest attendance?', icon: '📊' },
+                { text: 'How many students are below 75%?', icon: '❓' },
+                { text: 'Show today\'s attendance summary.', icon: '📋' },
+            ],
+        };
+
+        // Utility functions
+        function getCurrentUserRole() {
+            const userId = userSelect.value;
+            if (userId.startsWith('S')) return 'student';
+            if (userId.startsWith('P')) return 'parent';
+            if (userId.startsWith('T')) return 'teacher';
+            if (userId.startsWith('PR')) return 'principal';
+            return 'student';
+        }
+
+        function updateSamplesForRole() {
+            currentUserRole = getCurrentUserRole();
+            samplesContainer.innerHTML = '';
+            const samples = samplesByRole[currentUserRole] || samplesByRole.student;
+            samples.forEach(sample => {
+                const span = document.createElement('span');
+                span.className = 'sample';
+                span.textContent = `${sample.icon} ${sample.text}`;
+                span.title = sample.text;
+                span.addEventListener('click', () => sendMessage(sample.text));
+                samplesContainer.appendChild(span);
+            });
+        }
 
         function addMessage(text, sender = 'assistant') {
             const msg = document.createElement('div');
@@ -619,8 +767,8 @@
             msg.textContent = text;
             messagesEl.appendChild(msg);
             messagesEl.scrollTop = messagesEl.scrollHeight;
-            lastAssistantMessage = text;
             if (sender === 'assistant') {
+                lastAssistantMessage = text;
                 ttsBtn.disabled = false;
             }
         }
@@ -630,14 +778,16 @@
         }
 
         async function sendMessage(message) {
+            if (!message.trim()) return;
+
             const userId = userSelect.value;
             const language = languageSelect.value;
-            
-            if (!message.trim()) return;
 
             addMessage(message, 'user');
             history.push({ role: 'user', text: message });
             inputEl.value = '';
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
 
             setStatusIndicator('processing');
             avatar.classList.add('speaking');
@@ -646,144 +796,86 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        user_id: userId, 
-                        message, 
+                    body: JSON.stringify({
+                        user_id: userId,
+                        message,
                         history,
-                        language 
+                        language
                     })
                 });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
                 const data = await response.json();
                 const responseText = data.text || 'I am here to help.';
                 addMessage(responseText, 'assistant');
                 history.push({ role: 'assistant', text: responseText });
 
-                // Handle escalation actions
-                if (data.action && data.action.type === 'escalation') {
-                    showEscalationConfirmation(data.action.target, data.action.request_id);
-                }
-
                 setStatusIndicator('idle');
                 avatar.classList.remove('speaking');
             } catch (err) {
-                addMessage('I could not reach the AI service. Please try again.', 'assistant');
+                console.error('Chat error:', err);
+                addMessage('I could not reach the AI service. Please check your connection and try again.', 'assistant');
                 setStatusIndicator('idle');
                 avatar.classList.remove('speaking');
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                inputEl.focus();
             }
         }
 
-        function showEscalationConfirmation(target, requestId) {
-            const modalTitle = document.getElementById('escalationTitle');
-            const modalMessage = document.getElementById('escalationMessage');
-            
-            modalTitle.textContent = `Escalation Submitted`;
-            modalMessage.textContent = `Your request to escalate to ${target} has been submitted successfully. Request ID: ${requestId}`;
-            
+        function showEscalationConfirmation(target, message) {
+            const title = document.getElementById('escalationTitle');
+            const msgEl = document.getElementById('escalationMessage');
             const confirmBtn = document.getElementById('confirmEscalation');
-            confirmBtn.textContent = 'Close';
-            
+
+            title.textContent = `Escalate to ${target === 'teacher' ? 'Teacher' : 'Management'}?`;
+            msgEl.textContent = message || `Confirm escalation to ${target}`;
+            confirmBtn.textContent = 'Yes, Escalate';
+
             escalationModal.classList.add('show');
-            
+
             confirmBtn.onclick = () => {
                 escalationModal.classList.remove('show');
+                addMessage('Escalation request submitted successfully.', 'system');
             };
         }
 
-        document.getElementById('sendBtn').addEventListener('click', () => sendMessage(inputEl.value));
-        inputEl.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
+        // Event listeners
+        sendBtn.addEventListener('click', () => sendMessage(inputEl.value));
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage(inputEl.value);
             }
         });
 
-        document.querySelectorAll('.sample').forEach(item => {
-            item.addEventListener('click', () => sendMessage(item.dataset.message));
+        userSelect.addEventListener('change', () => {
+            updateSamplesForRole();
+            inputEl.focus();
         });
 
-        // Voice recognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            
-            recognition.onstart = () => {
-                isListening = true;
-                voiceBtn.textContent = '🎙️ Listening...';
-                setStatusIndicator('listening');
-                avatar.classList.add('listening');
-            };
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                inputEl.value = transcript;
-                isListening = false;
-                voiceBtn.textContent = '🎤 Speak to AI';
-                setStatusIndicator('processing');
-                sendMessage(transcript);
-            };
-
-            recognition.onerror = (event) => {
-                isListening = false;
-                voiceBtn.textContent = '🎤 Speak to AI';
-                setStatusIndicator('idle');
-                avatar.classList.remove('listening');
-            };
-
-            recognition.onend = () => {
-                isListening = false;
-                voiceBtn.textContent = '🎤 Speak to AI';
-                avatar.classList.remove('listening');
-            };
-
-            voiceBtn.addEventListener('click', () => {
-                if (!isListening) {
-                    recognition.start();
-                }
-            });
-        } else {
-            voiceBtn.disabled = true;
-            voiceBtn.textContent = '🎤 Not supported';
-        }
-
-        // Text-to-Speech
-        ttsBtn.addEventListener('click', () => {
-            if (!lastAssistantMessage) return;
-
-            const utterance = new SpeechSynthesisUtterance(lastAssistantMessage);
-            const language = languageSelect.value;
-            
-            // Map language codes to speech language
-            const langMap = {
-                'en': 'en-US',
-                'hi': 'hi-IN',
-                'ta': 'ta-IN',
-                'te': 'te-IN',
-                'mr': 'mr-IN',
-            };
-
-            utterance.lang = langMap[language] || 'en-US';
-            utterance.rate = 0.9;
-            
-            utterance.onstart = () => {
-                isSpeaking = true;
-                ttsBtn.textContent = '🔊 Speaking...';
-                setStatusIndicator('processing');
-                avatar.classList.add('speaking');
-            };
-
-            utterance.onend = () => {
-                isSpeaking = false;
-                ttsBtn.textContent = '🔊 Speak Response';
-                setStatusIndicator('idle');
-                avatar.classList.remove('speaking');
-            };
-
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(utterance);
+        languageSelect.addEventListener('change', (e) => {
+            const lang = e.target.value;
+            if (speechRecognitionInstance) {
+                const langMap = {
+                    'en': 'en-US',
+                    'hi': 'hi-IN',
+                    'ta': 'ta-IN',
+                    'te': 'te-IN',
+                    'mr': 'mr-IN',
+                    'bn': 'bn-IN',
+                    'gu': 'gu-IN',
+                    'pa': 'pa-IN',
+                    'kn': 'kn-IN',
+                    'ml': 'ml-IN',
+                    'ur': 'ur-IN',
+                };
+                speechRecognitionInstance.lang = langMap[lang] || 'en-US';
+            }
         });
 
-        // Close modal when clicking cancel or outside
         document.getElementById('cancelEscalation').addEventListener('click', () => {
             escalationModal.classList.remove('show');
         });
@@ -794,24 +886,119 @@
             }
         });
 
-        // Update language preference on change
-        languageSelect.addEventListener('change', (e) => {
-            const lang = e.target.value;
-            if (SpeechRecognition) {
-                const langMap = {
-                    'en': 'en-US',
-                    'hi': 'hi-IN',
-                    'ta': 'ta-IN',
-                    'te': 'te-IN',
-                    'mr': 'mr-IN',
-                };
-                recognition.lang = langMap[lang] || 'en-US';
-            }
+        // Voice Recognition Setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            speechRecognitionInstance = new SpeechRecognition();
+            speechRecognitionInstance.lang = 'en-US';
+            speechRecognitionInstance.continuous = false;
+            speechRecognitionInstance.interimResults = false;
+
+            speechRecognitionInstance.onstart = () => {
+                isListening = true;
+                voiceBtn.textContent = '🎙️ Listening...';
+                voiceBtn.style.opacity = '0.7';
+                setStatusIndicator('listening');
+                avatar.classList.add('listening');
+            };
+
+            speechRecognitionInstance.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0].transcript)
+                    .join('');
+                inputEl.value = transcript;
+                isListening = false;
+                voiceBtn.textContent = '🎤 Speak to AI';
+                voiceBtn.style.opacity = '1';
+                setStatusIndicator('processing');
+                avatar.classList.remove('listening');
+                sendMessage(transcript);
+            };
+
+            speechRecognitionInstance.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                isListening = false;
+                voiceBtn.textContent = '🎤 Speak to AI';
+                voiceBtn.style.opacity = '1';
+                setStatusIndicator('idle');
+                avatar.classList.remove('listening');
+                if (event.error !== 'no-speech') {
+                    addMessage(`Voice input error: ${event.error}`, 'system');
+                }
+            };
+
+            speechRecognitionInstance.onend = () => {
+                isListening = false;
+                voiceBtn.textContent = '🎤 Speak to AI';
+                voiceBtn.style.opacity = '1';
+                avatar.classList.remove('listening');
+            };
+
+            voiceBtn.addEventListener('click', () => {
+                if (!isListening) {
+                    try {
+                        speechRecognitionInstance.start();
+                    } catch (e) {
+                        console.error('Could not start speech recognition:', e);
+                    }
+                }
+            });
+        } else {
+            voiceBtn.disabled = true;
+            voiceBtn.textContent = '🎤 Not Supported';
+            voiceBtn.title = 'Speech recognition not supported in this browser';
+        }
+
+        // Text-to-Speech Setup
+        ttsBtn.addEventListener('click', () => {
+            if (!lastAssistantMessage) return;
+
+            const utterance = new SpeechSynthesisUtterance(lastAssistantMessage);
+            const language = languageSelect.value;
+
+            const langMap = {
+                'en': 'en-US',
+                'hi': 'hi-IN',
+                'ta': 'ta-IN',
+                'te': 'te-IN',
+                'mr': 'mr-IN',
+                'bn': 'bn-IN',
+                'gu': 'gu-IN',
+                'pa': 'pa-IN',
+                'kn': 'kn-IN',
+                'ml': 'ml-IN',
+                'ur': 'ur-IN',
+            };
+
+            utterance.lang = langMap[language] || 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+
+            utterance.onstart = () => {
+                isSpeaking = true;
+                ttsBtn.textContent = '🔊 Speaking...';
+                ttsBtn.style.opacity = '0.7';
+                setStatusIndicator('processing');
+                avatar.classList.add('speaking');
+            };
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                ttsBtn.textContent = '🔊 Speak Response';
+                ttsBtn.style.opacity = '1';
+                setStatusIndicator('idle');
+                avatar.classList.remove('speaking');
+            };
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
         });
 
-        // Greeting message
+        // Initialize
+        updateSamplesForRole();
         addMessage('Hello! I am XYZ AI, your school assistant. How may I help you today?', 'assistant');
         setStatusIndicator('idle');
+        inputEl.focus();
     </script>
 </body>
 </html>
