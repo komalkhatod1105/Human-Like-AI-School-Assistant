@@ -106,7 +106,7 @@ class SchoolAssistantService:
 
         # Add metadata
         response["language"] = language
-        response["intent"] = intent
+        response["intent"] = intent.value if isinstance(intent, Intent) else str(intent)
 
         return response
 

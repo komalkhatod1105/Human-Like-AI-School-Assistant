@@ -44,6 +44,13 @@ class IntentService:
 
         lower = message.lower()
 
+        # Escalation intents (check early - high priority action)
+        if self._is_teacher_escalation(lower):
+            return Intent.REQUEST_TEACHER_CALL, 0.95
+        
+        if self._is_management_escalation(lower):
+            return Intent.REQUEST_MANAGEMENT_CALL, 0.95
+
         # Attendance marking (check early - high priority action)
         if self._is_mark_attendance(lower):
             return Intent.MARK_ATTENDANCE, 0.90
@@ -53,7 +60,7 @@ class IntentService:
             return Intent.GET_SCHOOL_ATTENDANCE, 0.90
 
         # Attendance queries (check before escalations, but with role-specific handling)
-        if "attendance" in lower or "marks" in lower:
+        if self._is_attendance_query(lower):
             if role == "principal":
                 return Intent.GET_SCHOOL_ATTENDANCE, 0.85
             if role == "parent":
@@ -70,21 +77,6 @@ class IntentService:
             if role == "teacher":
                 return Intent.GET_STUDENT_ATTENDANCE, 0.85
             return Intent.GET_STUDENT_ATTENDANCE, 0.70
-
-        # Follow-up attendance questions (check after specific queries)
-        if self._is_recent_attendance(lower):
-            return Intent.GET_RECENT_ATTENDANCE, 0.85
-
-        # Class attendance questions
-        if self._is_class_attendance_query(lower):
-            return Intent.GET_CLASS_ATTENDANCE, 0.80
-
-        # Escalation intents (check AFTER attendance queries to avoid false positives)
-        if self._is_teacher_escalation(lower):
-            return Intent.REQUEST_TEACHER_CALL, 0.95
-        
-        if self._is_management_escalation(lower):
-            return Intent.REQUEST_MANAGEMENT_CALL, 0.95
 
         # Greetings and help
         if self._is_greeting(lower):
@@ -205,6 +197,17 @@ class IntentService:
             r"\b(how many students)\b.*\b(below|under|below than|less than)\b.*\b(attendance|percentage|percent)\b",
             r"\b(today['s]?|today's)\b.*\b(attendance|summary|report)\b",
             r"\b(school\s+attendance|overall\s+attendance|general\s+attendance)\b",
+        ]
+        return any(re.search(pattern, lower) for pattern in patterns)
+
+    def _is_attendance_query(self, lower):
+        """Check if message is asking about attendance (general pattern)."""
+        patterns = [
+            r"\b(attendance|marks|present|absent|absence)\b",
+            r"\b(how.*much|what.*attendance|what['s].*attendance|my.*attendance)\b",
+            r"\b(can you check|check.*attendance|show.*attendance)\b",
+            r"\b(am i|am i.*maintaining|what.*percentage)\b.*\b(attendance|present)\b",
+            r"\b(my child|child.*attendance|son['s]?.*attendance|daughter['s]?.*attendance|your child)\b",
         ]
         return any(re.search(pattern, lower) for pattern in patterns)
 
