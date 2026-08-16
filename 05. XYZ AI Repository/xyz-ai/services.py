@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from auth_service import AuthenticationService
 from conversation_service import ConversationService
-from intent_service import IntentService
+from intent_service import IntentService, Intent
 from language_service import LanguageService
 from attendance_service import AttendanceService
 from analytics_service import AnalyticsService
@@ -124,35 +124,35 @@ class SchoolAssistantService:
         Central handler for all intent types.
         """
         # Get appropriate response template
-        if intent == "GET_OWN_ATTENDANCE":
+        if intent == Intent.GET_OWN_ATTENDANCE:
             return self._handle_get_own_attendance(role, user_id, message, language)
 
-        elif intent == "GET_CHILD_ATTENDANCE":
+        elif intent == Intent.GET_CHILD_ATTENDANCE:
             return self._handle_get_child_attendance(
                 role, user_id, message, entities, context, language
             )
 
-        elif intent == "GET_STUDENT_ATTENDANCE":
+        elif intent == Intent.GET_STUDENT_ATTENDANCE:
             return self._handle_get_student_attendance(
                 role, user_id, message, entities, context, language
             )
 
-        elif intent == "MARK_ATTENDANCE":
+        elif intent == Intent.MARK_ATTENDANCE:
             return self._handle_mark_attendance(role, user_id, message, entities, language)
 
-        elif intent == "GET_SCHOOL_ATTENDANCE":
+        elif intent == Intent.GET_SCHOOL_ATTENDANCE:
             return self._handle_get_school_attendance(role, user_id, message, language)
 
-        elif intent == "GET_RECENT_ATTENDANCE":
+        elif intent == Intent.GET_RECENT_ATTENDANCE:
             return self._handle_get_recent_attendance(role, user_id, context, language)
 
-        elif intent == "TEACHER_ESCALATION":
+        elif intent == Intent.REQUEST_TEACHER_CALL:
             return self._handle_escalation(role, user_id, "teacher", message, language)
 
-        elif intent == "MANAGEMENT_ESCALATION":
+        elif intent == Intent.REQUEST_MANAGEMENT_CALL:
             return self._handle_escalation(role, user_id, "management", message, language)
 
-        elif intent == "GENERAL_HELP":
+        elif intent == Intent.GENERAL_HELP:
             return self._handle_general_help(role, language)
 
         else:
@@ -258,7 +258,7 @@ class SchoolAssistantService:
 
     def _handle_get_student_attendance(self, role, user_id, message, entities, context, language):
         """Handle teacher requesting student's attendance."""
-        if role not in ["teacher", "principal"]:
+        if role not in ["teacher", "principal", "parent"]:
             return {
                 "text": self.language.format_response(
                     language, "permission_denied"
@@ -296,6 +296,16 @@ class SchoolAssistantService:
             if not teacher or target_student["student_id"] not in teacher.get(
                 "authorized_student_ids", []
             ):
+                return {
+                    "text": self.language.format_response(
+                        language, "permission_denied"
+                    ),
+                    "status": "denied",
+                }
+        elif role == "parent":
+            # Check if this student is the parent's child
+            parent = self.db.get_parent(user_id)
+            if not parent or target_student["student_id"] not in parent.get("child_ids", []):
                 return {
                     "text": self.language.format_response(
                         language, "permission_denied"
